@@ -22,9 +22,7 @@ def dataset():
     dataset = []
 
     for myDir in os.listdir('CroppedYale'):
-        files = os.listdir('CroppedYale/{}'.format(myDir))
-
-        for myFile in files:
+        for myFile in os.listdir('CroppedYale/{}'.format(myDir)):
             dataset.append((myDir, myFile))
 
     return dataset
