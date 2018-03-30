@@ -1,4 +1,5 @@
 import numpy as np
+from skimage import io
 import os
 
 
@@ -23,6 +24,9 @@ def dataset():
 
     for myDir in os.listdir('CroppedYale'):
         for myFile in os.listdir('CroppedYale/{}'.format(myDir)):
-            dataset.append((myDir, myFile))
+            label = myDir
+            img = io.imread('CroppedYale/{0}/{1}'.format(myDir, myFile))
+            data = np.array(img)
+            dataset.append((label, data))
 
     return dataset
