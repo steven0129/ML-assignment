@@ -24,6 +24,6 @@ def kNearestNeighbor(train, test, k=1, distance_type='sad'):
     elif distance_type == 'ssd':
         distance = lambda x: np.sum(diff(x['data'], test['data'])**2)
 
-    topK = list(sorted(train, key=distance, reverse=True))[:k]
+    topK = list(sorted(train, key=distance))[:k]
     topLabels = [topK[i]['label'] for i in range(len(topK))]
     return max(set(topLabels), key=lambda x: topLabels.count(x))
