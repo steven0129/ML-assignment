@@ -2,23 +2,6 @@ import numpy as np
 from skimage import io
 import os
 
-
-def SAD(img1, img2):
-    x = np.array(img1)
-    y = np.array(img2)
-
-    distance = lambda a, b: a.astype(float)-b.astype(float)
-    return np.sum(abs(distance(x, y)))
-
-
-def SSD(img1, img2):
-    x = np.array(img1)
-    y = np.array(img2)
-
-    distance = lambda a, b: a.astype(float)-b.astype(float)
-    return np.sum(abs(distance(x, y))**2)
-
-
 def dataset():
     dataset = []
 
@@ -30,3 +13,17 @@ def dataset():
             dataset.append((label, data))
 
     return dataset
+
+def kNearestNeighbor(train, test, k=1, distance_type='sad'):
+    train = list(map(lambda data: {'label': data[0], 'data': data[1]}, train))
+    test = {'label': test[0], 'data': test[1]}
+    diff = lambda x, y: x.astype(float) - y.astype(float)
+
+    if distance_type == 'sad':
+        distance = lambda x: np.sum(abs(diff(x['data'], test['data'])))
+    elif distance_type == 'ssd':
+        distance = lambda x: np.sum(diff(x['data'], test['data'])**2)
+
+    topK = list(sorted(train, key=distance, reverse=True))[:k]
+    topLabels = [topK[i]['label'] for i in range(len(topK))]
+    return max(set(topLabels), key=lambda x: topLabels.count(x))
