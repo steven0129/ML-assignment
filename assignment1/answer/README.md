@@ -4,11 +4,11 @@
 
 ```
 $ pip install -r requirements.txt
-$ python main.py
+$ python main.py train
 ```
 
 ## 調整參數
 
 ```
-$ python main.py --k=3 --distance-type=sad
+$ python main.py train --k=3 --distance-type=sad
 ```
