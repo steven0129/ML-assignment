@@ -10,8 +10,7 @@ options = Env()
 
 def train(**kwargs):
     dataset = list(func.dataset())
-    trainingSet = []
-    testingSet = []
+    trainingSet = testingSet = []
 
     for label in os.listdir('CroppedYale'):
         data = list(filter(lambda x: x[0] == label, dataset))
