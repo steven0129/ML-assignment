@@ -25,8 +25,6 @@ def train(**kwargs):
         result = func.kNearestNeighbor(
             trainingSet, testData, k=options.k, distance_type=options.distance_type)
 
-        tqdm.write(result)
-        tqdm.write(label)
         correct = correct + 1 if label == result else correct
         count = count + 1
         tqdm.write('正確分類: {0}/{1}, 準確率: {2}%'.format(correct,
