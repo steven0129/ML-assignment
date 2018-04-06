@@ -1,22 +1,29 @@
 # Assignment 1
 
-## Quick Start
+## Installation
 
 ```
-$ pip install -r requirements.txt
-$ python main.py train
+pip install -r requirements.txt
+```
+
+## 預設參數
+
+預設參數為k=1, distance_type='ssd'
+
+```
+python main.py train
 ```
 
 ## 調整參數
 
 ```
-$ python main.py train --k=3 --distance-type=sad
+python main.py train --k=3 --distance-type=sad
 ```
 
 ## 超參數優化(Hyper-parameter optimization)
 
 ```
-$ python main.py hyperparameter
+python main.py hyperparameter
 ```
 
 ## 結論
