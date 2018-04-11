@@ -21,14 +21,16 @@ def trainingProcess(k=1, distance_type='ssd'):
         trainingSet.extend(trainData)
         testingSet.extend(testData)
 
-    correct = count = 0
+    correct = 0
+    count = 0
     for testData in tqdm(testingSet):
         label, _ = testData
         result = func.kNearestNeighbor(
             trainingSet, testData, k=k,
             distance_type=distance_type)
 
-        correct = correct + 1 if label == result else correct
+        # correct = correct + 1 if label == result else correct
+        if label==result: correct += 1
         count = count + 1
         tqdm.write('正確分類: {0}/{1}, 準確率: {2}%'.format(correct,
                                                      count, float(correct)/float(count)*100))
@@ -36,27 +38,12 @@ def trainingProcess(k=1, distance_type='ssd'):
     return correct, count, float(correct)/float(count)*100
 
 
-def train():
+def train(**kwargs):
+    for k_,v_ in kwargs.items():
+        setattr(options,k_,v_)
+
     correct, count, acc = trainingProcess(k=options.k, distance_type=options.distance_type)
     print('正確分類: {0}/{1}, 準確率: {2}%'.format(correct, count, acc))
-
-
-def hyperparameter():
-    with open('hyperparameter.csv', 'a') as f:
-        result = []
-        total_distance_type = ['sad', 'ssd']
-        for i in tqdm(range(230)):
-            randomK = randint(1, 500)
-            randomD = total_distance_type[randint(0, 1)]
-            tqdm.write('開始Sample第{0}次 (k={1}, randomD={2})'.format(i + 1, randomK, randomD))
-            _, _, acc = trainingProcess(k=randomK, distance_type=randomD)
-            result.append({'acc': acc, 'k': randomK, 'distance_type': randomD})
-            f.write(
-                '\n{0}, {1}, {2}'.format(randomK,randomD,acc))
-
-        maxObj = max(result, key=lambda x: x['acc'])
-        print('最高準確率: {0} (k={1}, distance_type={2})'.format(
-            maxObj['acc'], maxObj['k'], maxObj['distance_type']))
 
 if __name__ == '__main__':
     fire.Fire()

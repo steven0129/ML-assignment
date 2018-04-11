@@ -14,16 +14,16 @@ def dataset():
 
     return dataset
 
-def kNearestNeighbor(train, test, k=1, distance_type='sad'):
-    train = list(map(lambda data: {'label': data[0], 'data': data[1]}, train))
-    test = {'label': test[0], 'data': test[1]}
-    diff = lambda x, y: x.astype(float) - y.astype(float)
+def kNearestNeighbor(trainingSet, test, k=1, distance_type='sad'):
+    trainingSet = list(map(lambda data: {'label': data[0], 'data': data[1]}, trainingSet))
+    test = {'data': test[1]}
+    diff = lambda x, y: x - y
 
     if distance_type == 'sad':
         distance = lambda x: np.sum(abs(diff(x['data'], test['data'])))
     elif distance_type == 'ssd':
         distance = lambda x: np.sum(diff(x['data'], test['data'])**2)
 
-    topK = list(sorted(train, key=distance))[:k]
+    topK = sorted(trainingSet, key=distance)[:k]
     topLabels = [topK[i]['label'] for i in range(len(topK))]
     return max(set(topLabels), key=lambda x: topLabels.count(x))
