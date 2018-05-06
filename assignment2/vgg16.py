@@ -1,17 +1,12 @@
 from keras.models import Sequential
 from keras.models import Model
-from keras.layers import Input, Dense, Activation, Flatten, Conv2D, MaxPooling2D, AveragePooling2D
-from keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D, BatchNormalization
-from keras.optimizers import SGD
+from keras.layers import Input, Dense, Activation, Flatten, Conv2D, MaxPooling2D
 from sklearn.preprocessing import OneHotEncoder
 from tqdm import tqdm
-import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 import keras
 import numpy as np
 import cv2
 import os
-import multiprocessing
 
 def getData():
     print('資料取得中...')
