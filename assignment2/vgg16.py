@@ -5,11 +5,28 @@ from keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D, BatchNormal
 from keras.optimizers import SGD
 from skimage import io
 from sklearn.preprocessing import OneHotEncoder
+from tqdm import tqdm
 import tensorflow as tf
 import keras.backend.tensorflow_backend as KTF
 import keras
 import numpy as np
 import cv2
+import os
+import multiprocessing
+
+def getData():
+    print('資料取得中...')
+    dataset = []
+    pool = multiprocessing.Pool()
+
+    for myDir in tqdm(os.listdir('CroppedYale')):
+        for myFile in os.listdir(f'CroppedYale/{myDir}'):
+            if not myFile.endswith('.pgm'): continue
+            label = myDir
+            data = cv2.resize(cv2.imread(f'CroppedYale/{myDir}/{myFile}'), (224, 224)).astype(np.float32)
+            dataset.append((label, data))
+
+    return dataset
 
 def VGG_16(classify_num, weights_path=None, input_shape=[224, 224, 3]):
     img_input = Input(shape=input_shape)
@@ -60,17 +77,28 @@ def VGG_16(classify_num, weights_path=None, input_shape=[224, 224, 3]):
     return model
 
 if __name__ == "__main__":
-    img1 = cv2.resize(cv2.imread('1.pgm'), (224, 224)).astype(np.float32).tolist()
-    img2 = cv2.resize(cv2.imread('2.pgm'), (224, 224)).astype(np.float32).tolist()
-    data = np.array([img1, img2])
+    dataset = list(getData())
+    trainingSet = []
+    testingSet = []
 
-    encoder = OneHotEncoder()
-    labels = encoder.fit_transform([[1], [2]]).toarray()
+    for label in os.listdir('CroppedYale'):
+        data = list(filter(lambda x: x[0] == label, dataset))
+        trainData, testData = data[:35], data[35:]
+        trainingSet.extend(trainData)
+        testingSet.extend(testData)
 
-    model = VGG_16(classify_num=labels.shape[0])
-    model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=1e-4), metrics=['accuracy'])
-    model.fit(x=data, y=labels, epochs=1)
+    print('輸入訓練資料中...')
+
+    X = np.zeros((len(trainingSet), 224, 224, 3))
+    Y = [0] * len(trainingSet)
+    for idx, (y, x) in enumerate(tqdm(trainingSet)):
+        X[idx] = x
+        Y[idx] = int(y[5:])
     
-    out = model.predict(np.array([img1, img2]))
-    print(out)
-    print(np.argmax(out, axis=1))
+    encoder = OneHotEncoder()
+    labels = encoder.fit_transform(list(map(lambda x: [x], Y))).toarray()
+    print(labels.shape)
+
+    model = VGG_16(classify_num=labels.shape[1])
+    model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=1e-4), metrics=['acc'])
+    model.fit(x=X, y=labels, epochs=1)
