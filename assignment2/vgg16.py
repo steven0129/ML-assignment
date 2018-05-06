@@ -98,10 +98,10 @@ if __name__ == "__main__":
     encoder = OneHotEncoder()
     encoder.fit(list(map(lambda x: [x], trainY)))
     trainY = encoder.transform(list(map(lambda x: [x], trainY))).toarray()
-    testY = encoder.transform(list(map(lambda x: [x], testY))).toarray()
 
     model = VGG_16(classify_num=trainY.shape[1], weights_path='model.h5')
     model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=1e-4), metrics=['acc'])
     model.fit(x=trainX, y=trainY, epochs=50)
-    out = model.predict(testX)
-    print(np.argmax(out, axis=1))
+    out = model.predict(testX, verbose=1)
+    acc = (np.argmax(out, axis=1) == testY).sum() / testY.shape[0]
+    print(acc)
