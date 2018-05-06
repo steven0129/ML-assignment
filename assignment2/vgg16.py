@@ -82,15 +82,26 @@ if __name__ == "__main__":
 
     print('輸入訓練資料中...')
 
-    X = np.zeros((len(trainingSet), 224, 224, 3))
-    Y = [0] * len(trainingSet)
+    trainX = np.zeros((len(trainingSet), 224, 224, 3))
+    trainY = [0] * len(trainingSet)
+    testX = np.zeros((len(testingSet), 224, 224, 3))
+    testY = [0] * len(testingSet)
+
     for idx, (y, x) in enumerate(tqdm(trainingSet)):
-        X[idx] = x
-        Y[idx] = int(y[5:])
+        trainX[idx] = x
+        trainY[idx] = int(y[5:])
+
+    for idx, (y, x) in enumerate(tqdm(testingSet)):
+        testX[idx] = x
+        testY[idx] = int(y[5:])
     
     encoder = OneHotEncoder()
-    labels = encoder.fit_transform(list(map(lambda x: [x], Y))).toarray()
+    encoder.fit(list(map(lambda x: [x], trainY)))
+    trainY = encoder.transform(list(map(lambda x: [x], trainY))).toarray()
+    testY = encoder.transform(list(map(lambda x: [x], testY))).toarray()
 
-    model = VGG_16(classify_num=labels.shape[1], weights_path='model.h5')
+    model = VGG_16(classify_num=trainY.shape[1], weights_path='model.h5')
     model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=1e-4), metrics=['acc'])
-    model.fit(x=X, y=labels, epochs=1)
+    model.fit(x=trainX, y=trainY, epochs=50)
+    out = model.predict(testX)
+    print(np.argmax(out, axis=1))
