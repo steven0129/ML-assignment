@@ -104,4 +104,4 @@ if __name__ == "__main__":
     model.fit(x=trainX, y=trainY, epochs=50)
     out = model.predict(testX, verbose=1)
     acc = (np.argmax(out, axis=1) == testY).sum() / len(testY)
-    print(acc)
+    print(str(acc))
