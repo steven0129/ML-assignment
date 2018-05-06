@@ -3,7 +3,6 @@ from keras.models import Model
 from keras.layers import Input, Dense, Activation, Flatten, Conv2D, MaxPooling2D, AveragePooling2D
 from keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D, BatchNormalization
 from keras.optimizers import SGD
-from skimage import io
 from sklearn.preprocessing import OneHotEncoder
 from tqdm import tqdm
 import tensorflow as tf
@@ -17,7 +16,6 @@ import multiprocessing
 def getData():
     print('資料取得中...')
     dataset = []
-    pool = multiprocessing.Pool()
 
     for myDir in tqdm(os.listdir('CroppedYale')):
         for myFile in os.listdir(f'CroppedYale/{myDir}'):
@@ -72,7 +70,7 @@ def VGG_16(classify_num, weights_path=None, input_shape=[224, 224, 3]):
     model = Model(inputs=inputs, outputs=x, name='vgg16')
 
     if weights_path:
-        model.load_weights(weights_path)
+        model.load_weights(weights_path, by_name=True)
 
     return model
 
@@ -97,8 +95,7 @@ if __name__ == "__main__":
     
     encoder = OneHotEncoder()
     labels = encoder.fit_transform(list(map(lambda x: [x], Y))).toarray()
-    print(labels.shape)
 
-    model = VGG_16(classify_num=labels.shape[1])
+    model = VGG_16(classify_num=labels.shape[1], weights_path='model.h5')
     model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(lr=1e-4), metrics=['acc'])
     model.fit(x=X, y=labels, epochs=1)
